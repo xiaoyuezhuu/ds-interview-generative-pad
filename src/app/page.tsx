@@ -36,6 +36,9 @@ const App = () => {
   const [activeTab, setActiveTab] = useState('editor'); 
   const [showApiKey, setShowApiKey] = useState(true);
 
+  // Stats State
+  const [stats, setStats] = useState({ Easy: 0, Medium: 0, Hard: 0 });
+
   // --- Load SQLite Engine (sql.js) ---
   useEffect(() => {
     const loadSqlJs = async () => {
@@ -320,6 +323,14 @@ const App = () => {
       if (userStr === solStr) {
         setFeedback({ type: 'success', message: '🎉 Correct! Your output matches the solution.' });
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#4F46E5', '#10B981', '#F59E0B'] });
+        
+        // Update stats
+        if (currentQ.difficulty) {
+          setStats(prev => ({
+            ...prev,
+            [currentQ.difficulty]: prev[currentQ.difficulty] + 1
+          }));
+        }
       } else {
         setFeedback({ type: 'error', message: '❌ Incorrect. Output differs from the expected solution.' });
       }
@@ -362,13 +373,31 @@ const App = () => {
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-indigo-100">
       {/* Navbar */}
       <nav className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
-        <div className="flex items-center gap-2">
-          <div className="bg-indigo-600 p-2 rounded-lg">
-            <Database className="w-6 h-6 text-white" />
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2">
+            <div className="bg-indigo-600 p-2 rounded-lg">
+              <Database className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-slate-900 leading-tight">SQL Interview AI Pad</h1>
+              <p className="text-xs text-slate-500">Powered by Gemini, built by <a href="https://xiaoyuezhu.xyz/" className="text-indigo-600 hover:underline">Xiaoyue</a></p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-slate-900 leading-tight">SQL Interview AI</h1>
-            <p className="text-xs text-slate-500">Powered by React, SQLite & Gemini</p>
+
+          {/* Stats Counter */}
+          <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-lg border border-slate-100">
+             <div className="flex flex-col items-center px-2 border-r border-slate-200 last:border-0">
+               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Easy</span>
+               <span className="text-sm font-bold text-green-600">{stats.Easy}</span>
+             </div>
+             <div className="flex flex-col items-center px-2 border-r border-slate-200 last:border-0">
+               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Medium</span>
+               <span className="text-sm font-bold text-yellow-600">{stats.Medium}</span>
+             </div>
+             <div className="flex flex-col items-center px-2 last:border-0">
+               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hard</span>
+               <span className="text-sm font-bold text-red-600">{stats.Hard}</span>
+             </div>
           </div>
         </div>
         <div className="flex items-center gap-4">
